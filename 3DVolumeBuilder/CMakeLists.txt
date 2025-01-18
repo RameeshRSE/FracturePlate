@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(3DVolumeBuilder  C CXX)
-SET(VTK_DIR "/Users/rameeshradhakrishnan/Documents/VTK-9.4.1/Build" CACHE PATH "VTK directory override" FORCE)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

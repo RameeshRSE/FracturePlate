@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(MediImageProcessor  C CXX)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 find_package(Threads REQUIRED)
 
@@ -22,3 +22,5 @@ add_subdirectory(MedicalImageReader)
 add_subdirectory(OBJExporter)
 add_subdirectory(MediImageProcessor)
 add_subdirectory(MediImageViewer)
+add_subdirectory(InputProcessor)
+
