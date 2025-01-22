@@ -13,6 +13,7 @@ int main()
    auto f = R"(
     {
         "fracture_plate": {
+            "no_of_screws": 5,
             "width":  8,
             "length": 7,
             "thickness": 0.5,
@@ -20,7 +21,9 @@ int main()
             "screw_params" : {
             "shaft_diameter":0.1,
             "shaft_length": 0.8,
-            "thread_pitch": 0.3
+            "thread_pitch": 0.3,
+            "head_diameter": 0.2,
+            "head_height": 0.5
             },
             "contours":[]
         }

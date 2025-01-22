@@ -19,10 +19,14 @@ namespace Input
             params.m_Length = fracture_plate_item["length"];;
             params.m_Width = fracture_plate_item["width"];
             params.m_Thickness = fracture_plate_item["thickness"];
-            params.m_Type = (fracture_plate_item["plate_type"] == "0") ? STRAIGHT :  PRE_CONTURED;
+            params.m_NoOfScrews = fracture_plate_item["no_of_screws"];
+            params.m_Type = (fracture_plate_item["plate_type"] == 0) ? STRAIGHT :  PRE_CONTURED;
             params.m_ScrewParamters.m_shaftDiameter = screw_item["shaft_diameter"];
             params.m_ScrewParamters.m_ShaftLength  = screw_item["shaft_length"];
             params.m_ScrewParamters.m_ThreadPitch = screw_item["thread_pitch"];
+            params.m_ScrewParamters.m_ThreadDepth = screw_item["thread_depth"];
+            params.m_ScrewParamters.m_HeadDiameter = screw_item["head_diameter"];
+            params.m_ScrewParamters.m_HeadHeight = screw_item["head_height"];
         } 
         catch (json::exception& e) 
         {
