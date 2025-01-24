@@ -24,5 +24,4 @@ add_subdirectory(MediImageProcessor)
 add_subdirectory(MediImageViewer)
 add_subdirectory(InputProcessor)
 add_subdirectory(GeometryProcessor)
-
-
+add_subdirectory(GeometricAlgo)

@@ -14,6 +14,10 @@
 #include <vtkCleanPolyData.h>
 
 
+#include <Eigen/Core>
+#include <igl/copyleft/cgal/boolean.h>
+
+
 #include "GeometryCore.hpp"
 
 namespace Geometry {

@@ -8,6 +8,7 @@
 #include "../InputProcessor/InputProcessor.hpp"
 #include "ScrewGeometryBuilder.hpp"
 #include "FracturePlateGeometryBuilder.hpp"
+#include "HoleGeometryBuilder.hpp"
 
 
 
@@ -40,12 +41,16 @@ int main()
 
     auto screw = Geometry::ScrewGeometryBuilder().CreateGeometry(params);
     auto f_plate = Geometry::FracturePlateGeometryBuilder().CreateGeometry(params);
+    auto hole = Geometry::HoleGeometryBuilder(f_plate, screw).CreateGeometry(params);
     
     auto screw_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     screw_mapper->SetInputData(screw);
 
     auto f_plate_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     f_plate_mapper->SetInputData(f_plate);
+
+    auto hole_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    hole_mapper->SetInputData(hole);
     
     auto screw_actor = vtkSmartPointer<vtkActor>::New();
     screw_actor->SetMapper(screw_mapper);
@@ -55,6 +60,10 @@ int main()
     f_plate_actor->SetMapper(f_plate_mapper);
     f_plate_actor->GetProperty()->SetColor(0.3, 0.3, 0.1); 
 
+    auto hole_actor = vtkSmartPointer<vtkActor>::New();
+    hole_actor->SetMapper(hole_mapper);
+    hole_actor->GetProperty()->SetColor(0.3, 0.3, 0.1); 
+
     // Step 5: Visualization
     vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
     vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
@@ -63,8 +72,9 @@ int main()
     vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     renderWindowInteractor->SetRenderWindow(renderWindow);
 
-    renderer->AddActor(screw_actor);
-    renderer->AddActor(f_plate_actor);
+    renderer->AddActor(hole_actor);
+    //renderer->AddActor(screw_actor);
+    //renderer->AddActor(f_plate_actor);
     renderer->SetBackground(0.1, 0.1, 0.1); // Background color
     
     renderWindow->Render();
