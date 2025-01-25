@@ -13,6 +13,7 @@
 
 #include "GeometryCore.hpp"
 #include "FracturePlateGeometryBuilder.hpp"
+#include "../GeometryCore/BooleanOperations.hpp"
 
 namespace 
 {
@@ -39,14 +40,16 @@ namespace
         r_end = Geometry::PivotPointRotation(r_end, vtkVector3d(), vtkVector3d(1.0, 0.0, 0.0),-90);
         l_end = Geometry::Translate(l_end, vtkVector3d(0,  -fl_length/2.0, 0));
         r_end = Geometry::Translate(r_end, vtkVector3d(0,  fl_length/2.0,  0));
-        f_plate = Geometry::Translate(f_plate, vtkVector3d(-fl_width/2.0, -fl_length/2.0, -fl_height/2.0));
 
-        auto f_plate_scale = Geometry::Scale(f_plate, vtkVector3d(0, 0, 0 ), vtkVector3d(1.1, 1.0, 1.1));
-        l_end=  Geometry::ApplyBooleanSubtraction(l_end, f_plate_scale);
-        r_end = Geometry::ApplyBooleanSubtraction(r_end, f_plate_scale);
+        r_end = Geometry::Trinagulate(r_end);
+        l_end = Geometry::Trinagulate(l_end);
+        f_plate =  Geometry::Trinagulate(f_plate);
+
+        l_end=  GeometryCore::ApplyBooleanSubtraction(l_end, f_plate);
+        r_end = GeometryCore::ApplyBooleanSubtraction(r_end, f_plate);
 
         auto append = vtkSmartPointer<vtkAppendPolyData>::New();
-        append->AddInputData(f_plate);
+        append->AddInputData(f_plate );
         append->AddInputData(l_end);
         append->AddInputData(r_end);
         append->Update();

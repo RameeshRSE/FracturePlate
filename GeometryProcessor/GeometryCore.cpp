@@ -1,7 +1,6 @@
 
 #include <vtkCylinderSource.h>
 #include <vtkLinearExtrusionFilter.h>
-#include <vtkBooleanOperationPolyDataFilter.h>
 #include <vtkAppendPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
@@ -12,53 +11,19 @@
 #include <vtkTransformFilter.H>
 #include <vtkTriangleFilter.h>
 #include <vtkCleanPolyData.h>
-
-
-#include <Eigen/Core>
-#include <igl/copyleft/cgal/boolean.h>
-
-
+#include <vtkCubeSource.h>
 #include "GeometryCore.hpp"
 
 namespace Geometry {
 vtkSmartPointer<vtkPolyData> CreateBox(double width, double length, double height)
 {
     // Points for flat fracture plate
-    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-
-    // Assume origin is (0, 0, 0) for simplicity.
-    double z = 0.0;
-    points->InsertNextPoint(0.0, 0.0, z);               // Bottom-left corner
-    points->InsertNextPoint(width, 0.0, z);            // Bottom-right corner
-    points->InsertNextPoint(width, length, z);         // Top-right corner
-    points->InsertNextPoint(0.0, length, z);           // Top-left corner
-
-    // Create a single polygon for the flat plate
-    vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();
-    polygon->GetPointIds()->SetNumberOfIds(4); // 4 corners
-    for (int i = 0; i < 4; i++) {
-        polygon->GetPointIds()->SetId(i, i);
-    }
-
-    // Cell array to hold the polygon
-    vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
-    polygons->InsertNextCell(polygon);
-
-    // Create the polydata to represent the fracture plate
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-    polyData->SetPoints(points);
-    polyData->SetPolys(polygons);
-
-    // 1. Create Fracture Plate Plane with given width and length 
-    // 2. Extrude plane to given thickness
-    auto extrudeFilter = vtkSmartPointer<vtkLinearExtrusionFilter>::New();
-    extrudeFilter->SetInputData(polyData);
-    extrudeFilter->SetExtrusionTypeToVectorExtrusion();
-    extrudeFilter->SetVector(0.0, 0.0, 1.0); // Extrude along Z-axis
-    extrudeFilter->SetScaleFactor(height);      // Extrusion length
-    extrudeFilter->Update();
-
-    return  extrudeFilter->GetOutput();
+    auto box = vtkSmartPointer<vtkCubeSource>::New();
+    box->SetXLength(width);
+    box->SetYLength(length);
+    box->SetZLength(height);
+    box->Update();
+    return  box->GetOutput();
 }
 
 vtkSmartPointer<vtkPolyData> CreateCylinder(double radius, double height)
@@ -120,31 +85,17 @@ vtkSmartPointer<vtkPolyData> Scale(vtkSmartPointer<vtkPolyData> obj, const vtkVe
     return transformFilter->GetPolyDataOutput();
 }
 
-vtkSmartPointer<vtkPolyData> 
-ApplyBooleanSubtraction(vtkSmartPointer<vtkPolyData> input1,
-                        vtkSmartPointer<vtkPolyData> input2)
+vtkSmartPointer<vtkPolyData> Trinagulate(vtkSmartPointer<vtkPolyData> input)
 {
-    vtkSmartPointer<vtkCleanPolyData> clean1 = vtkSmartPointer<vtkCleanPolyData>::New();
-    clean1->SetInputData(input1);
-    clean1->Update();
+    vtkSmartPointer<vtkCleanPolyData> clean = vtkSmartPointer<vtkCleanPolyData>::New();
+    clean->SetInputData(input);
+    clean->Update();
 
-    vtkSmartPointer<vtkCleanPolyData> clean2 = vtkSmartPointer<vtkCleanPolyData>::New();
-    clean2->SetInputData(input2);
-    clean2->Update();
 
-    vtkNew<vtkTriangleFilter> tri1;
-    tri1->SetInputData(clean1->GetOutput());
-    tri1->Update();
+    vtkNew<vtkTriangleFilter> tr;
+    tr->SetInputData(clean->GetOutput());
+    tr->Update();
 
-    vtkNew<vtkTriangleFilter> tri2;
-    tri2->SetInputData(clean2->GetOutput());
-    tri2->Update();
-
-    vtkNew<vtkBooleanOperationPolyDataFilter> booleanOperation;
-    booleanOperation->SetOperationToDifference();
-    booleanOperation->SetInputData(0, tri1->GetOutput());
-    booleanOperation->SetInputData(1, tri2->GetOutput());
-    booleanOperation->Update();
-    return booleanOperation->GetOutput();
+    return tr->GetOutput();
 }
 }

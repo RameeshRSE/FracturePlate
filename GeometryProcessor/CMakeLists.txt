@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 find_package(Threads REQUIRED)
 find_package(nlohmann_json REQUIRED)
-find_package(LIBIGL REQUIRED QUIET)
-
 find_package(VTK COMPONENTS 
   CommonColor
   CommonCore
@@ -14,16 +12,18 @@ find_package(VTK COMPONENTS
   FiltersCore
   FiltersModeling
   FiltersSources
+  FiltersFlowPaths
   InteractionImage
   InteractionStyle
 )
+
 
 add_library(GeometryProcessor SHARED GeometryCore.cpp
                                      ScrewGeometryBuilder.cpp
                                      FracturePlateGeometryBuilder.cpp
                                      HoleGeometryBuilder.cpp)
 
-target_link_libraries(GeometryProcessor PUBLIC ${VTK_LIBRARIES} GeometricAlgo)
+target_link_libraries(GeometryProcessor PUBLIC ${VTK_LIBRARIES} GeometricAlgo GeometryCore)
 add_executable(FracturePlateViewer FracturePlateViewer.cpp)
 target_link_libraries(FracturePlateViewer PUBLIC   InputProcessor GeometryProcessor  GeometricAlgo)
 add_executable(BooleanTest testBoolean.cpp)

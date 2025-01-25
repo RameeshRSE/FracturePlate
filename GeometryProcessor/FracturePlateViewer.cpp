@@ -17,7 +17,7 @@ int main()
     auto f = R"(
     {
         "fracture_plate": {
-            "no_of_screws": 5,
+            "no_of_screws": 3,
             "width":  10,
             "length": 70,
             "thickness": 2.0,
@@ -73,8 +73,7 @@ int main()
     renderWindowInteractor->SetRenderWindow(renderWindow);
 
     renderer->AddActor(hole_actor);
-    //renderer->AddActor(screw_actor);
-    //renderer->AddActor(f_plate_actor);
+    renderer->AddActor(screw_actor);
     renderer->SetBackground(0.1, 0.1, 0.1); // Background color
     
     renderWindow->Render();

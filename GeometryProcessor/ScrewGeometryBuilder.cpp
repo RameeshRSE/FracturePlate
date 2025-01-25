@@ -2,12 +2,19 @@
 #include <iostream>
 #include <vtkCylinderSource.h>
 #include <vtkLineSource.h>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
 #include <vtkTubeFilter.h>
 #include <vtkAppendPolyData.h>
 #include <vtkPolyLine.h>
 #include <vtkTubeFilter.h>
-
+#include <vtkTriangleFilter.h>
+#include <vtkCleanPolyData.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkFeatureEdges.h>
+#include <vtkRotationalExtrusionFilter.h>
 #include <cmath>
+#include <vtkVector.h>
 
 #include "ScrewGeometryBuilder.hpp"
 #include "GeometryCore.hpp"
@@ -18,38 +25,49 @@ namespace  {
 vtkSmartPointer<vtkPolyData> CreateHelicalThread(double radius, double pitch, double height) {
     auto points = vtkSmartPointer<vtkPoints>::New();
     int n_turns = int(height/pitch);
-    int resolution = n_turns * 100; // Higher resolution gives smoother thread
-    double thetaStep = 2.0* vtkMath::Pi() / 100.0; // Adjust for thread detail
+    int resolution = n_turns * 20; // Higher resolution gives smoother thread
+    int n_steps = 30;
+    auto poly = vtkSmartPointer<vtkCellArray>::New();
+    points->InsertPoint(0, 1.0, 0.0, 0.0);
+    points->InsertPoint(1, 1.0732, 0.0, -0.1768);
+    points->InsertPoint(2, 1.25, 0.0, -0.25);
+    points->InsertPoint(3, 1.4268, 0.0, -0.1768);
+    points->InsertPoint(4, 1.5, 0.0, 0.00);
+    points->InsertPoint(5, 1.4268, 0.0, 0.1768);
+    points->InsertPoint(6, 1.25, 0.0, 0.25);
+    points->InsertPoint(7, 1.0732, 0.0, 0.1768);
 
-    for (int i = 0; i <= resolution; ++i) {
-        double theta = i * thetaStep;
-        double x = radius * cos(theta);
-        double y = radius * sin(theta);
-        double z = (double)(i/100.0) * pitch; 
-        points->InsertNextPoint(x, y, z);
-    }
+    poly->InsertNextCell(8); // number of points
+    poly->InsertCellPoint(0);
+    poly->InsertCellPoint(1);
+    poly->InsertCellPoint(2);
+    poly->InsertCellPoint(3);
+    poly->InsertCellPoint(4);
+    poly->InsertCellPoint(5);
+    poly->InsertCellPoint(6);
+    poly->InsertCellPoint(7);
 
-    auto polyline = vtkSmartPointer<vtkPolyLine>::New();
-    polyline->GetPointIds()->SetNumberOfIds(resolution + 1);
-    for (int i = 0; i <= resolution; ++i) {
-        polyline->GetPointIds()->SetId(i, i);
-    }
+    auto profile= vtkSmartPointer<vtkPolyData>::New();
+    profile->SetPoints(points);
+    profile->SetPolys(poly);
 
-    auto lines = vtkSmartPointer<vtkCellArray>::New();
-    lines->InsertNextCell(polyline);
+    profile = Geometry::Translate(profile, vtkVector3d(radius - 1.0,0, 0));
 
-    auto polyData = vtkSmartPointer<vtkPolyData>::New();
-    polyData->SetPoints(points);
-    polyData->SetLines(lines);
+    auto extrude= vtkSmartPointer<vtkRotationalExtrusionFilter>::New();
+    extrude->SetInputData(profile);
+    extrude->SetResolution(resolution);
+    extrude->SetTranslation(height);
+    extrude->SetDeltaRadius(0.0);
+    extrude->SetAngle(n_turns*360.0); 
+    extrude->Update();
 
-    vtkNew<vtkTubeFilter> tubeFilter;
-    tubeFilter->SetInputData(polyData);
-    tubeFilter->SetRadius(.2); // default is .5
-    tubeFilter->SetNumberOfSides(50);
-    tubeFilter->Update();
-    
+    auto normals= vtkSmartPointer<vtkPolyDataNormals>::New();
+    normals->SetInputConnection(extrude->GetOutputPort());
+    normals->SetFeatureAngle(60);
+    normals->Update();
 
-    return tubeFilter->GetOutput();
+   
+    return normals->GetOutput() ;
 }
 
 }
@@ -71,6 +89,7 @@ vtkSmartPointer<vtkPolyData> ScrewGeometryBuilder::CreateGeometry(const Input::F
 
     auto helix = CreateHelicalThread(screw_params.m_shaftDiameter/2.0, screw_params.m_ThreadPitch, screw_params.m_ShaftLength); // Radius, Pitch, Height
     helix = Geometry::Translate(helix, vtkVector3d(0, 0.0, -screw_params.m_ShaftLength/2.0));
+   
     // Combine parts
     auto append = vtkSmartPointer<vtkAppendPolyData>::New();
     append->AddInputData(shaft);
@@ -78,7 +97,7 @@ vtkSmartPointer<vtkPolyData> ScrewGeometryBuilder::CreateGeometry(const Input::F
     append->AddInputData(helix);
     append->Update();
 
-    return append->GetOutput();
+    return  Geometry::Trinagulate(append->GetOutput());
 }
 
 }
