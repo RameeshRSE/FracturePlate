@@ -3,6 +3,6 @@
 
 namespace Algo {
 std::vector<vtkVector3d> CreateVShapeThreadProfile(double major_dia, double minor_dia, double pitch);
-void CreateButtressThreadProfile();
+std::vector<vtkVector3d> CreateButtressThreadProfile(double major_dia, double minor_dia, double pitch);
 
 }

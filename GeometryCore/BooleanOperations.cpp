@@ -5,10 +5,15 @@
 #include <Eigen/Core>
 #include <vtkTriangleFilter.h>
 #include <vtkCleanPolyData.h>
+#include <chrono>
 
+using namespace std;
+using namespace std::chrono;
 
 #include "BooleanOperations.hpp"
 #include "igl/MeshBooleanType.h"
+
+
 namespace  {
 
 // Function to convert vtkPolyData to Eigen matrices
@@ -64,13 +69,38 @@ vtkSmartPointer<vtkPolyData> ApplyBoolean(vtkSmartPointer<vtkPolyData> input1, v
     // Convert vtkPolyData to Eigen
     Eigen::MatrixXd VA, VB, VC;
     Eigen::MatrixXi FA, FB, FC;
+    auto start = high_resolution_clock::now();
+
     vtkPolyDataToEigen(input1, VA, FA);
     vtkPolyDataToEigen(input2, VB, FB);   
-    // Perform Boolean Operation: Union
-    igl::copyleft::cgal::mesh_boolean(VA, FA, VB, FB, op, VC, FC);
 
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+
+    cout << "VTK to Eigen Conversion Execution Time : "
+         << duration.count() << " microseconds" << endl;
+    // Perform Boolean Operation: Union
+    start = high_resolution_clock::now();
+    igl::copyleft::cgal::mesh_boolean(VA, FA, VB, FB, op, VC, FC);
+    stop = high_resolution_clock::now();
+    duration = duration_cast<microseconds>(stop - start);
+
+    cout << "Boolean Execution Time : "
+         << duration.count() << " microseconds" << endl;
+    // Perform Boolean Operation: Union
+ 
+    start = high_resolution_clock::now();
+    auto p_data = EigenToVtkPolyData(VC, FC);
     // Convert back to vtkPolyData
-    return EigenToVtkPolyData(VC, FC);
+    stop = high_resolution_clock::now();
+
+    duration = duration_cast<microseconds>(stop - start);
+
+    cout << "Eigen to VTKq Conversion Execution Time : "
+         << duration.count() << " microseconds" << endl;
+
+
+    return p_data ;
 }
 }
 namespace GeometryCore {
