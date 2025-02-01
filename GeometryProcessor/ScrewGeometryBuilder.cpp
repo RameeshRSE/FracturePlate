@@ -18,6 +18,7 @@
 
 #include "ScrewGeometryBuilder.hpp"
 #include "GeometryCore.hpp"
+#include "ThreadProfileBuilder.hpp"
 
 namespace  {
 
@@ -28,37 +29,39 @@ vtkSmartPointer<vtkPolyData> CreateHelicalThread(double radius, double pitch, do
     int resolution = n_turns * 20; // Higher resolution gives smoother thread
     int n_steps = 30;
     auto poly = vtkSmartPointer<vtkCellArray>::New();
-    points->InsertPoint(0, 1.0, 0.0, 0.0);
+    auto tp = Algo::CreateVShapeThreadProfile(radius + 0.2, radius, pitch);
+
+    /*points->InsertPoint(0, 1.0, 0.0, 0.0);
     points->InsertPoint(1, 1.0732, 0.0, -0.1768);
     points->InsertPoint(2, 1.25, 0.0, -0.25);
     points->InsertPoint(3, 1.4268, 0.0, -0.1768);
     points->InsertPoint(4, 1.5, 0.0, 0.00);
     points->InsertPoint(5, 1.4268, 0.0, 0.1768);
     points->InsertPoint(6, 1.25, 0.0, 0.25);
-    points->InsertPoint(7, 1.0732, 0.0, 0.1768);
+    points->InsertPoint(7, 1.0732, 0.0, 0.1768);*/
 
-    poly->InsertNextCell(8); // number of points
+    points->InsertPoint(0, tp[0].GetX(), tp[0].GetY(), tp[0].GetZ());
+    points->InsertPoint(1, tp[1].GetX(), tp[1].GetY(), tp[1].GetZ());
+    points->InsertPoint(2, tp[2].GetX(), tp[2].GetY(), tp[2].GetZ());
+    points->InsertPoint(3, tp[3].GetX(), tp[3].GetY(), tp[3].GetZ());
+    points->InsertPoint(4, tp[4].GetX(), tp[4].GetY(), tp[4].GetZ());
+    poly->InsertNextCell(5); // number of points
     poly->InsertCellPoint(0);
     poly->InsertCellPoint(1);
     poly->InsertCellPoint(2);
     poly->InsertCellPoint(3);
     poly->InsertCellPoint(4);
-    poly->InsertCellPoint(5);
-    poly->InsertCellPoint(6);
-    poly->InsertCellPoint(7);
 
     auto profile= vtkSmartPointer<vtkPolyData>::New();
     profile->SetPoints(points);
     profile->SetPolys(poly);
-
-    profile = Geometry::Translate(profile, vtkVector3d(radius - 1.0,0, 0));
 
     auto extrude= vtkSmartPointer<vtkRotationalExtrusionFilter>::New();
     extrude->SetInputData(profile);
     extrude->SetResolution(resolution);
     extrude->SetTranslation(height);
     extrude->SetDeltaRadius(0.0);
-    extrude->SetAngle(n_turns*360.0); 
+    extrude->SetAngle(n_turns*360); 
     extrude->Update();
 
     auto normals= vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -87,8 +90,8 @@ vtkSmartPointer<vtkPolyData> ScrewGeometryBuilder::CreateGeometry(const Input::F
     head  = Geometry::PivotPointRotation(head, vtkVector3d(0,0,0), vtkVector3d(1, 0, 0), 90);
 
 
-    auto helix = CreateHelicalThread(screw_params.m_shaftDiameter/2.0, screw_params.m_ThreadPitch, screw_params.m_ShaftLength); // Radius, Pitch, Height
-    helix = Geometry::Translate(helix, vtkVector3d(0, 0.0, -screw_params.m_ShaftLength/2.0));
+    auto helix = CreateHelicalThread(screw_params.m_shaftDiameter/2.0, screw_params.m_ThreadPitch, screw_params.m_ShaftLength - screw_params.m_HeadHeight); // Radius, Pitch, Height
+    helix = Geometry::Translate(helix, vtkVector3d(0, 0.0, -(screw_params.m_ShaftLength/2.0 + screw_params.m_HeadHeight)));
    
     // Combine parts
     auto append = vtkSmartPointer<vtkAppendPolyData>::New();

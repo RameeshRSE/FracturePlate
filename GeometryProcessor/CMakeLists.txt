@@ -21,7 +21,8 @@ find_package(VTK COMPONENTS
 add_library(GeometryProcessor SHARED GeometryCore.cpp
                                      ScrewGeometryBuilder.cpp
                                      FracturePlateGeometryBuilder.cpp
-                                     HoleGeometryBuilder.cpp)
+                                     HoleGeometryBuilder.cpp
+                                     ThreadProfileBuilder.cpp)
 
 target_link_libraries(GeometryProcessor PUBLIC ${VTK_LIBRARIES} GeometricAlgo GeometryCore)
 add_executable(FracturePlateViewer FracturePlateViewer.cpp)

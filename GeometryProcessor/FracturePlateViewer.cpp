@@ -9,7 +9,7 @@
 #include "ScrewGeometryBuilder.hpp"
 #include "FracturePlateGeometryBuilder.hpp"
 #include "HoleGeometryBuilder.hpp"
-
+#include "ThreadProfileBuilder.hpp"
 
 
 int main()
@@ -19,13 +19,13 @@ int main()
         "fracture_plate": {
             "no_of_screws": 3,
             "width":  10,
-            "length": 70,
+            "length": 80,
             "thickness": 2.0,
             "plate_type": 0,
             "screw_params" : {
             "shaft_diameter": 3.0,
             "shaft_length": 50.0,
-            "thread_pitch": 1,
+            "thread_pitch": 0.5,
             "thread_depth": 1,
             "head_diameter": 5.0,
             "head_height": 1.0
@@ -34,6 +34,9 @@ int main()
         }
     }
     )";
+    
+    Algo::CreateVShapeThreadProfile(2.5, 0.5, 3);
+
     Input::InputProcessor& p = Input::InputProcessor::getShared();
    
     auto params = p.ProcessParams(f);
