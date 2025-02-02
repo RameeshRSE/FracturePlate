@@ -2,7 +2,7 @@
 #include "IGeometryBuilder.hpp"
 
 
-#ifndef SCREW_PLATE_GEOMETRY_BUILDER_HPP
+#ifndef SCREW_GEOMETRY_BUILDER_HPP
 #define SCREW_GEOMETRY_BUILDER_HPP
 
 namespace Geometry {

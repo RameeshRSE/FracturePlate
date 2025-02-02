@@ -29,7 +29,7 @@ vtkSmartPointer<vtkPolyData> CreateHelicalThread(double radius, double pitch, do
     int resolution = n_turns * 20; // Higher resolution gives smoother thread
     int n_steps = 30;
     auto poly = vtkSmartPointer<vtkCellArray>::New();
-    auto tp = Algo::CreateVShapeThreadProfile(radius + 0.2, radius, pitch);
+    auto tp = Algo::CreateButtressThreadProfile(radius + 0.2, radius, pitch);
 
     /*points->InsertPoint(0, 1.0, 0.0, 0.0);
     points->InsertPoint(1, 1.0732, 0.0, -0.1768);
@@ -91,7 +91,7 @@ vtkSmartPointer<vtkPolyData> ScrewGeometryBuilder::CreateGeometry(const Input::F
 
 
     auto helix = CreateHelicalThread(screw_params.m_shaftDiameter/2.0, screw_params.m_ThreadPitch, screw_params.m_ShaftLength - screw_params.m_HeadHeight); // Radius, Pitch, Height
-    helix = Geometry::Translate(helix, vtkVector3d(0, 0.0, -(screw_params.m_ShaftLength/2.0 + screw_params.m_HeadHeight)));
+    helix = Geometry::Translate(helix, vtkVector3d(0, 0.0, -(screw_params.m_ShaftLength/2.0)));
    
     // Combine parts
     auto append = vtkSmartPointer<vtkAppendPolyData>::New();

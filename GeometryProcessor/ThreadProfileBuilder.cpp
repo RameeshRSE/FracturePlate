@@ -2,34 +2,11 @@
 #include <cmath>
 #include <iostream>
 #include <vtkVector.h>
+#include "../GeometricAlgo/CoreMath.hpp"
 
-
-namespace  {
-
-  const auto DtoR = M_PI/180.0;
-
-  struct Line2D
-  {
-    double a = 0, b = 0, c = 0;
-
-    Line2D(double a1, double b1, double c1):a(a1), b(b1), c(c1){}
-  };
-
-  vtkVector2d CalcLineIntersection(const Line2D& l1, const Line2D& l2)
-  {
-       const double det = l1.a * l2.b - l2.a * l1.b;
-
-       if (fabs(det) > 0.00001)
-       {
-          return vtkVector2d((l2.b * l1.c - l1.b *l2.c )/det, (l1.a*l2.c - l2.a *l1.c)/det);
-       }
-
-       return vtkVector2d(0, 0);
-  }
-}
 
 namespace Algo {
-
+using namespace CoreMath;
 
 std::vector<vtkVector3d> CreateVShapeThreadProfile(double major_dia, double minor_dia, double pitch)
 {
