@@ -25,8 +25,11 @@ namespace Input
             params.m_ScrewParamters.m_ShaftLength  = screw_item["shaft_length"];
             params.m_ScrewParamters.m_ThreadPitch = screw_item["thread_pitch"];
             params.m_ScrewParamters.m_ThreadDepth = screw_item["thread_depth"];
-            params.m_ScrewParamters.m_HeadDiameter = screw_item["head_diameter"];
+            params.m_ScrewParamters.m_HeadBaseDiameter = screw_item["head_base_diameter"];
+            params.m_ScrewParamters.m_HeadTopDiameter = screw_item["head_top_diameter"];
             params.m_ScrewParamters.m_HeadHeight = screw_item["head_height"];
+            params.m_ScrewParamters.m_socket_diameter = screw_item["socket_diameter"];
+            params.m_ScrewParamters.m_socket_height = screw_item["socket_height"];
         } 
         catch (json::exception& e) 
         {

@@ -26,9 +26,12 @@ namespace Input
         double m_ShaftLength = 0.0;
         double m_shaftDiameter = 0.0;
         double m_ThreadPitch = 0.0;
-        double m_HeadDiameter  = 0.0;
+        double m_HeadTopDiameter  = 0.0;
+        double m_HeadBaseDiameter = 0.0;
         double m_HeadHeight = 0.0;
         double m_ThreadDepth = 0.0;
+        double m_socket_diameter = 0.0;
+        double m_socket_height = 0.0;
     };
 
     struct FracturePlateParameters

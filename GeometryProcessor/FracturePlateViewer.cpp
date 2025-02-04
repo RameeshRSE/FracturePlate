@@ -20,23 +20,24 @@ int main()
             "no_of_screws": 3,
             "width":  10,
             "length": 80,
-            "thickness": 2.0,
+            "thickness": 4.0,
             "plate_type": 0,
             "screw_params" : {
-            "shaft_diameter": 3.0,
-            "shaft_length": 50.0,
-            "thread_pitch": 0.9,
+            "shaft_diameter": 1.5,
+            "shaft_length": 40.0,
+            "thread_pitch": 0.5,
             "thread_depth": 1,
-            "head_diameter": 5.0,
-            "head_height": 1.0
+            "head_top_diameter": 5.0,
+            "head_base_diameter": 4.0,
+            "head_height": 2.0,
+            "socket_diameter":3.0,
+            "socket_height":1.5 
             },
             "contours":[]
         }
     }
     )";
     
-   auto a =  CoreMath::CreateConeProfile(5.0, 2.0, 3);
-
     Input::InputProcessor& p = Input::InputProcessor::getShared();
    
     auto params = p.ProcessParams(f);
@@ -66,6 +67,8 @@ int main()
     auto hole_actor = vtkSmartPointer<vtkActor>::New();
     hole_actor->SetMapper(hole_mapper);
     hole_actor->GetProperty()->SetColor(0.3, 0.3, 0.1); 
+    //hole_actor->GetProperty()->SetRepresentationToWireframe();
+
 
     // Step 5: Visualization
     vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();

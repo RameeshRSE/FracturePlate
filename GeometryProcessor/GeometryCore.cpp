@@ -13,6 +13,8 @@
 #include <vtkCleanPolyData.h>
 #include <vtkCubeSource.h>
 #include "GeometryCore.hpp"
+#include <vtkRotationalExtrusionFilter.h>
+#include "../GeometricAlgo/CoreMath.hpp"
 
 namespace Geometry {
 vtkSmartPointer<vtkPolyData> CreateBox(double width, double length, double height)
@@ -24,6 +26,33 @@ vtkSmartPointer<vtkPolyData> CreateBox(double width, double length, double heigh
     box->SetZLength(height);
     box->Update();
     return  box->GetOutput();
+}
+
+vtkSmartPointer<vtkPolyData> CreateCone( double top_diameter, double botton_diameter, double height)
+{
+    auto points = vtkSmartPointer<vtkPoints>::New();
+    auto profile = CoreMath::CreateConeProfile(botton_diameter, top_diameter, height);
+    auto poly = vtkSmartPointer<vtkCellArray>::New();
+    poly->InsertNextCell(profile.size()); // number of points
+
+    for(int i = 0; i < profile.size(); ++i)
+    {
+        points->InsertPoint(i, profile[i].GetX(), profile[i].GetY(), profile[i].GetZ());
+        poly->InsertCellPoint(i);
+    }
+
+    auto cone_profile= vtkSmartPointer<vtkPolyData>::New();
+    cone_profile->SetPoints(points);
+    cone_profile->SetPolys(poly);
+
+    auto extrude= vtkSmartPointer<vtkRotationalExtrusionFilter>::New();
+    extrude->SetInputData(cone_profile);
+    extrude->SetResolution(50);
+    extrude->SetTranslation(0.0);
+    extrude->SetDeltaRadius(0.0);
+    extrude->SetAngle(360); 
+    extrude->Update();
+    return extrude->GetOutput();
 }
 
 vtkSmartPointer<vtkPolyData> CreateCylinder(double radius, double height)

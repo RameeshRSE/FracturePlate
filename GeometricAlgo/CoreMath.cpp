@@ -32,26 +32,55 @@ namespace CoreMath {
 std::vector<vtkVector3d> CreateConeProfile(double base_diameter, double top_diameter, double height)
 {
     std::vector<vtkVector3d> profile_points;
-    Line2D lVertical(1.0, 0.0, 0.0);
+    auto p0= vtkVector2d(0,0);
     auto p1 = vtkVector2d(base_diameter/2.0, 0.0);
     auto p2 = vtkVector2d(top_diameter/2.0, height);
-    auto slop = (p2.GetY() - p1.GetY())/(p2.GetX() - p1.GetX()); 
-    auto c = p1.GetY() - slop * p1.GetX();
-    Line2D l2(-slop, 1.0, c);
-    Line2D lBase(0.0, 1, base_diameter);
-    Line2D lTop(0.0, 1, top_diameter);
-    auto p0= vtkVector2d(0,0);
-    p1 = CalcLineIntersection(l2, lBase);
-    p2 = CalcLineIntersection(l2, lTop);
-    auto p3 = vtkVector2d(0,height);
+    auto p3 = vtkVector2d(0.0,height);
     std::cout<<"P1:"<<p0<<" P2:"<<p1<<" P3:"<<p2<<" P4:"<<p3<<"\n";
-    std::cout<<"Cone Angle ="<<AngleBetween2DLines(l2, lVertical)<<"\n";
-    profile_points.push_back(vtkVector3d(p0.GetY(), 0.0, p0.GetX()));
-    profile_points.push_back(vtkVector3d(p1.GetY(), 0.0, p1.GetX()));
-    profile_points.push_back(vtkVector3d(p2.GetY(), 0.0, p2.GetX()));
-    profile_points.push_back(vtkVector3d(p3.GetY(), 0.0, p3.GetX()));
-    profile_points.push_back(vtkVector3d(p0.GetY(), 0.0, p0.GetX()));
-    
+    profile_points.push_back(vtkVector3d(p0.GetX(), 0.0, p0.GetY()));
+    profile_points.push_back(vtkVector3d(p1.GetX(), 0.0, p1.GetY()));
+    profile_points.push_back(vtkVector3d(p2.GetX(), 0.0, p2.GetY()));
+    profile_points.push_back(vtkVector3d(p3.GetX(), 0.0, p3.GetY()));
+    profile_points.push_back(vtkVector3d(p0.GetX(), 0.0, p0.GetY()));
+
+
     return profile_points;
 }
+
+#define LOBES 6
+#define STEPS 360 // More steps for smoother curve
+std::vector<vtkVector3d> GenerateTorxProfile(double R) {
+    std::vector<vtkVector3d> points;
+    for (int i = 0; i <= STEPS; ++i) {
+        double theta = (2 * M_PI * i) / STEPS;  // Angle from 0 to 2π
+        double r = R * (1 - 0.1 * cos(LOBES * theta));  // Torx radial function
+    
+        double x = r * cos(theta);
+        double y = r * sin(theta);
+        points.push_back(vtkVector3d(x, y, 0));
+    }
+
+    points.push_back(points[0]);
+
+    return points;
+}
+
+// Function to generate hexagon vertices
+std::vector<vtkVector3d> GenerateHexagon(double height) {
+    const double sqrt3 = std::sqrt(3);
+    double sideLength = height / sqrt3; // s = h / sqrt(3)
+
+    // Define the hexagon vertices (centered at origin)
+    std::vector<vtkVector3d> vertices = {
+        {sideLength, 0, 0},
+        {sideLength / 2, height / 2, 0},
+        {-sideLength / 2, height / 2, 0},
+        {-sideLength, 0, 0},
+        {-sideLength / 2, -height / 2, 0},
+        {sideLength / 2, -height / 2, 0}
+    };
+
+    return vertices;
+}
+
 }

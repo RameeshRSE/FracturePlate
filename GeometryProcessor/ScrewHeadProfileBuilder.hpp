@@ -1,12 +1,21 @@
 
-#include <vtkVector.h>
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
 #include <vector>
 
 #ifndef SCREW_HEAD_PROFILE_BUILDER_HPP
 #define SCREW_HEAD_PROFILE_BUILDER_HPP
 namespace Algo {
-std::vector<vtkVector3d> CreateHexagonalHead(double base_diameter, double top_diameter, double height);
-std::vector<vtkVector3d> CreateTorxHead(double base_diameter, double top_diameter, double height);
+vtkSmartPointer<vtkPolyData>  CreateHexagonalHead(double base_diameter, 
+                                                  double top_diameter, 
+                                                  double height,
+                                                  double socket_diameter,
+                                                  double socket_height);
+vtkSmartPointer<vtkPolyData> CreateTorxHead(double base_diameter, 
+               double top_diameter, 
+               double height,
+               double socket_diameter, 
+               double socket_height);
 
 }
 

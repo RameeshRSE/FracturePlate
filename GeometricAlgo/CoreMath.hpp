@@ -18,7 +18,8 @@ namespace CoreMath {
 
   vtkVector2d CalcLineIntersection(const Line2D& l1, const Line2D& l2);
   double AngleBetween2DLines(const Line2D& l1, const Line2D& l2);
-
+  std::vector<vtkVector3d> GenerateTorxProfile(double R);
+  std::vector<vtkVector3d> GenerateHexagon(double height);
   std::vector<vtkVector3d> CreateConeProfile(double base_diameter, double top_diameter, double height);
 }
 

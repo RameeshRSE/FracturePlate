@@ -22,7 +22,8 @@ add_library(GeometryProcessor SHARED GeometryCore.cpp
                                      ScrewGeometryBuilder.cpp
                                      FracturePlateGeometryBuilder.cpp
                                      HoleGeometryBuilder.cpp
-                                     ThreadProfileBuilder.cpp)
+                                     ThreadProfileBuilder.cpp
+                                     ScrewHeadProfileBuilder.cpp)
 
 target_link_libraries(GeometryProcessor PUBLIC ${VTK_LIBRARIES} GeometricAlgo GeometryCore)
 add_executable(FracturePlateViewer FracturePlateViewer.cpp)

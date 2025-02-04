@@ -19,6 +19,7 @@
 #include "ScrewGeometryBuilder.hpp"
 #include "GeometryCore.hpp"
 #include "ThreadProfileBuilder.hpp"
+#include "ScrewHeadProfileBuilder.hpp"
 
 namespace  {
 
@@ -27,9 +28,8 @@ vtkSmartPointer<vtkPolyData> CreateHelicalThread(double radius, double pitch, do
     auto points = vtkSmartPointer<vtkPoints>::New();
     int n_turns = int(height/pitch);
     int resolution = n_turns * 20; // Higher resolution gives smoother thread
-    int n_steps = 30;
     auto poly = vtkSmartPointer<vtkCellArray>::New();
-    auto tp = Algo::CreateButtressThreadProfile(radius + 0.2, radius, pitch);
+    auto tp = Algo::CreateVShapeThreadProfile(radius + 0.2, radius, pitch);
 
     /*points->InsertPoint(0, 1.0, 0.0, 0.0);
     points->InsertPoint(1, 1.0732, 0.0, -0.1768);
@@ -61,7 +61,7 @@ vtkSmartPointer<vtkPolyData> CreateHelicalThread(double radius, double pitch, do
     extrude->SetResolution(resolution);
     extrude->SetTranslation(height);
     extrude->SetDeltaRadius(0.0);
-    extrude->SetAngle(n_turns*360); 
+    extrude->SetAngle(n_turns*360.0); 
     extrude->Update();
 
     auto normals= vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -85,12 +85,10 @@ vtkSmartPointer<vtkPolyData> ScrewGeometryBuilder::CreateGeometry(const Input::F
 
     std::cout<<" H D"<<screw_params.m_HeadHeight<<"\n";
     // Screw head
-    auto head = Geometry::CreateCylinder(screw_params.m_HeadDiameter/2.0, screw_params.m_HeadHeight);
-    head = Geometry::Translate(head, vtkVector3d(0, screw_params.m_ShaftLength/2.0, 0.0));
-    head  = Geometry::PivotPointRotation(head, vtkVector3d(0,0,0), vtkVector3d(1, 0, 0), 90);
+    auto head = Algo::CreateTorxHead(screw_params.m_HeadBaseDiameter, screw_params.m_HeadTopDiameter, screw_params.m_HeadHeight,screw_params.m_socket_diameter, screw_params.m_socket_height);
+    head = Geometry::Translate(head, vtkVector3d(0, 0.0, screw_params.m_ShaftLength/2.0));
 
-
-    auto helix = CreateHelicalThread(screw_params.m_shaftDiameter/2.0, screw_params.m_ThreadPitch, screw_params.m_ShaftLength - screw_params.m_HeadHeight); // Radius, Pitch, Height
+    auto helix = CreateHelicalThread(screw_params.m_shaftDiameter/2.0, screw_params.m_ThreadPitch, screw_params.m_ShaftLength); // Radius, Pitch, Height
     helix = Geometry::Translate(helix, vtkVector3d(0, 0.0, -(screw_params.m_ShaftLength/2.0)));
    
     // Combine parts
